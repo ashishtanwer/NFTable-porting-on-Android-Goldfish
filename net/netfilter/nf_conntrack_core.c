@@ -39,6 +39,7 @@
 #include <net/netfilter/nf_conntrack_l4proto.h>
 #include <net/netfilter/nf_conntrack_expect.h>
 #include <net/netfilter/nf_conntrack_helper.h>
+#include <net/netfilter/nf_conntrack_seqadj.h>
 #include <net/netfilter/nf_conntrack_core.h>
 #include <net/netfilter/nf_conntrack_extend.h>
 #include <net/netfilter/nf_conntrack_acct.h>
@@ -47,6 +48,7 @@
 #include <net/netfilter/nf_conntrack_timestamp.h>
 #include <net/netfilter/nf_conntrack_timeout.h>
 #include <net/netfilter/nf_conntrack_labels.h>
+#include <net/netfilter/nf_conntrack_synproxy.h>
 #include <net/netfilter/nf_nat.h>
 #include <net/netfilter/nf_nat_core.h>
 #include <net/netfilter/nf_nat_helper.h>
@@ -796,6 +798,11 @@ init_conntrack(struct net *net, struct nf_conn *tmpl,
 	if (IS_ERR(ct))
 		return (struct nf_conntrack_tuple_hash *)ct;
 
+	if (tmpl && nfct_synproxy(tmpl)) {
+		nfct_seqadj_ext_add(ct);
+		nfct_synproxy_ext_add(ct);
+	}
+
 	timeout_ext = tmpl ? nf_ct_timeout_find(tmpl) : NULL;
 	if (timeout_ext)
 		timeouts = NF_CT_TIMEOUT_EXT_DATA(timeout_ext);
@@ -1351,6 +1358,7 @@ void nf_conntrack_cleanup_end(void)
 	nf_ct_extend_unregister(&nf_ct_zone_extend);
 #endif
 	nf_conntrack_proto_fini();
+	nf_conntrack_seqadj_fini();
 	nf_conntrack_labels_fini();
 	nf_conntrack_helper_fini();
 	nf_conntrack_timeout_fini();
@@ -1556,6 +1564,10 @@ int nf_conntrack_init_start(void)
 	if (ret < 0)
 		goto err_labels;
 
+	ret = nf_conntrack_seqadj_init();
+	if (ret < 0)
+		goto err_seqadj;
+
 #ifdef CONFIG_NF_CONNTRACK_ZONES
 	ret = nf_ct_extend_register(&nf_ct_zone_extend);
 	if (ret < 0)
@@ -1580,6 +1592,8 @@ err_proto:
 	nf_ct_extend_unregister(&nf_ct_zone_extend);
 err_extend:
 #endif
+	nf_conntrack_seqadj_fini();
+err_seqadj:
 	nf_conntrack_labels_fini();
 err_labels:
 	nf_conntrack_helper_fini();
@@ -1602,9 +1616,6 @@ void nf_conntrack_init_end(void)
 	/* For use by REJECT target */
 	RCU_INIT_POINTER(ip_ct_attach, nf_conntrack_attach);
 	RCU_INIT_POINTER(nf_ct_destroy, destroy_conntrack);
-
-	/* Howto get NAT offsets */
-	RCU_INIT_POINTER(nf_ct_nat_offset, NULL);
 }
 
 /*

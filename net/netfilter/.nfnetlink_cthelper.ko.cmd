@@ -1,0 +1,1 @@
+cmd_net/netfilter/nfnetlink_cthelper.ko := /home/ashishtanwer/goldfish3.10/../x86_64-linux-android-4.7/bin/x86_64-linux-android-ld -r -m elf_i386 -T /home/ashishtanwer/goldfish3.10/scripts/module-common.lds --build-id  -o net/netfilter/nfnetlink_cthelper.ko net/netfilter/nfnetlink_cthelper.o net/netfilter/nfnetlink_cthelper.mod.o

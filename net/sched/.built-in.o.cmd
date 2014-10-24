@@ -1,0 +1,1 @@
+cmd_net/sched/built-in.o :=  /home/ashishtanwer/goldfish3.10/../x86_64-linux-android-4.7/bin/x86_64-linux-android-ld -m elf_i386   -r -o net/sched/built-in.o net/sched/sch_generic.o net/sched/sch_mq.o 

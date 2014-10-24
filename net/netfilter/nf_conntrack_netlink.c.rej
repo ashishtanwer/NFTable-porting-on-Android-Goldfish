@@ -1,0 +1,103 @@
+--- net/netfilter/nf_conntrack_netlink.c
++++ net/netfilter/nf_conntrack_netlink.c
+@@ -1436,66 +1433,65 @@
+ 	return err;
+ }
+ 
+-#ifdef CONFIG_NF_NAT_NEEDED
+-static const struct nla_policy nat_seq_policy[CTA_NAT_SEQ_MAX+1] = {
+-	[CTA_NAT_SEQ_CORRECTION_POS]	= { .type = NLA_U32 },
+-	[CTA_NAT_SEQ_OFFSET_BEFORE]	= { .type = NLA_U32 },
+-	[CTA_NAT_SEQ_OFFSET_AFTER]	= { .type = NLA_U32 },
++static const struct nla_policy seqadj_policy[CTA_SEQADJ_MAX+1] = {
++	[CTA_SEQADJ_CORRECTION_POS]	= { .type = NLA_U32 },
++	[CTA_SEQADJ_OFFSET_BEFORE]	= { .type = NLA_U32 },
++	[CTA_SEQADJ_OFFSET_AFTER]	= { .type = NLA_U32 },
+ };
+ 
+ static inline int
+-change_nat_seq_adj(struct nf_nat_seq *natseq, const struct nlattr * const attr)
++change_seq_adj(struct nf_ct_seqadj *seq, const struct nlattr * const attr)
+ {
+ 	int err;
+-	struct nlattr *cda[CTA_NAT_SEQ_MAX+1];
++	struct nlattr *cda[CTA_SEQADJ_MAX+1];
+ 
+-	err = nla_parse_nested(cda, CTA_NAT_SEQ_MAX, attr, nat_seq_policy);
++	err = nla_parse_nested(cda, CTA_SEQADJ_MAX, attr, seqadj_policy);
+ 	if (err < 0)
+ 		return err;
+ 
+-	if (!cda[CTA_NAT_SEQ_CORRECTION_POS])
++	if (!cda[CTA_SEQADJ_CORRECTION_POS])
+ 		return -EINVAL;
+ 
+-	natseq->correction_pos =
+-		ntohl(nla_get_be32(cda[CTA_NAT_SEQ_CORRECTION_POS]));
++	seq->correction_pos =
++		ntohl(nla_get_be32(cda[CTA_SEQADJ_CORRECTION_POS]));
+ 
+-	if (!cda[CTA_NAT_SEQ_OFFSET_BEFORE])
++	if (!cda[CTA_SEQADJ_OFFSET_BEFORE])
+ 		return -EINVAL;
+ 
+-	natseq->offset_before =
+-		ntohl(nla_get_be32(cda[CTA_NAT_SEQ_OFFSET_BEFORE]));
++	seq->offset_before =
++		ntohl(nla_get_be32(cda[CTA_SEQADJ_OFFSET_BEFORE]));
+ 
+-	if (!cda[CTA_NAT_SEQ_OFFSET_AFTER])
++	if (!cda[CTA_SEQADJ_OFFSET_AFTER])
+ 		return -EINVAL;
+ 
+-	natseq->offset_after =
+-		ntohl(nla_get_be32(cda[CTA_NAT_SEQ_OFFSET_AFTER]));
++	seq->offset_after =
++		ntohl(nla_get_be32(cda[CTA_SEQADJ_OFFSET_AFTER]));
+ 
+ 	return 0;
+ }
+ 
+ static int
+-ctnetlink_change_nat_seq_adj(struct nf_conn *ct,
+-			     const struct nlattr * const cda[])
++ctnetlink_change_seq_adj(struct nf_conn *ct,
++			 const struct nlattr * const cda[])
+ {
++	struct nf_conn_seqadj *seqadj = nfct_seqadj(ct);
+ 	int ret = 0;
+-	struct nf_conn_nat *nat = nfct_nat(ct);
+ 
+-	if (!nat)
++	if (!seqadj)
+ 		return 0;
+ 
+-	if (cda[CTA_NAT_SEQ_ADJ_ORIG]) {
+-		ret = change_nat_seq_adj(&nat->seq[IP_CT_DIR_ORIGINAL],
+-					 cda[CTA_NAT_SEQ_ADJ_ORIG]);
++	if (cda[CTA_SEQ_ADJ_ORIG]) {
++		ret = change_seq_adj(&seqadj->seq[IP_CT_DIR_ORIGINAL],
++				     cda[CTA_SEQ_ADJ_ORIG]);
+ 		if (ret < 0)
+ 			return ret;
+ 
+ 		ct->status |= IPS_SEQ_ADJUST;
+ 	}
+ 
+-	if (cda[CTA_NAT_SEQ_ADJ_REPLY]) {
+-		ret = change_nat_seq_adj(&nat->seq[IP_CT_DIR_REPLY],
+-					 cda[CTA_NAT_SEQ_ADJ_REPLY]);
++	if (cda[CTA_SEQ_ADJ_REPLY]) {
++		ret = change_seq_adj(&seqadj->seq[IP_CT_DIR_REPLY],
++				     cda[CTA_SEQ_ADJ_REPLY]);
+ 		if (ret < 0)
+ 			return ret;
+ 
+@@ -2204,6 +2196,7 @@
+ 	.build		= ctnetlink_nfqueue_build,
+ 	.parse		= ctnetlink_nfqueue_parse,
+ 	.attach_expect	= ctnetlink_nfqueue_attach_expect,
++	.seq_adjust	= nf_ct_tcp_seqadj_set,
+ };
+ #endif /* CONFIG_NETFILTER_NETLINK_QUEUE_CT */
+ 

@@ -1,0 +1,1 @@
+cmd_net/ipv6/netfilter/nf_nat_ipv6.ko := /home/ashishtanwer/goldfish3.10/../x86_64-linux-android-4.7/bin/x86_64-linux-android-ld -r -m elf_i386 -T /home/ashishtanwer/goldfish3.10/scripts/module-common.lds --build-id  -o net/ipv6/netfilter/nf_nat_ipv6.ko net/ipv6/netfilter/nf_nat_ipv6.o net/ipv6/netfilter/nf_nat_ipv6.mod.o

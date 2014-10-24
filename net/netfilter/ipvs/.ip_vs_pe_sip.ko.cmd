@@ -1,0 +1,1 @@
+cmd_net/netfilter/ipvs/ip_vs_pe_sip.ko := /home/ashishtanwer/goldfish3.10/../x86_64-linux-android-4.7/bin/x86_64-linux-android-ld -r -m elf_i386 -T /home/ashishtanwer/goldfish3.10/scripts/module-common.lds --build-id  -o net/netfilter/ipvs/ip_vs_pe_sip.ko net/netfilter/ipvs/ip_vs_pe_sip.o net/netfilter/ipvs/ip_vs_pe_sip.mod.o

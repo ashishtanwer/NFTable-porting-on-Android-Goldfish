@@ -42,7 +42,8 @@ extern void netfilter_init(void);
 
 struct sk_buff;
 
-typedef unsigned int nf_hookfn(unsigned int hooknum,
+struct nf_hook_ops;
+typedef unsigned int nf_hookfn(const struct nf_hook_ops *ops,
 			       struct sk_buff *skb,
 			       const struct net_device *in,
 			       const struct net_device *out,
@@ -52,12 +53,13 @@ struct nf_hook_ops {
 	struct list_head list;
 
 	/* User fills in from here down. */
-	nf_hookfn *hook;
-	struct module *owner;
-	u_int8_t pf;
-	unsigned int hooknum;
+	nf_hookfn	*hook;
+	struct module	*owner;
+	void		*priv;
+	u_int8_t	pf;
+	unsigned int	hooknum;
 	/* Hooks are ordered in ascending priority. */
-	int priority;
+	int		priority;
 };
 
 struct nf_sockopt_ops {
@@ -319,20 +321,17 @@ extern void nf_ct_attach(struct sk_buff *, struct sk_buff *);
 extern void (*nf_ct_destroy)(struct nf_conntrack *) __rcu;
 
 struct nf_conn;
+enum ip_conntrack_info;
 struct nlattr;
 
 struct nfq_ct_hook {
 	size_t (*build_size)(const struct nf_conn *ct);
 	int (*build)(struct sk_buff *skb, struct nf_conn *ct);
 	int (*parse)(const struct nlattr *attr, struct nf_conn *ct);
+	void (*seq_adjust)(struct sk_buff *skb, struct nf_conn *ct,
+	enum ip_conntrack_info ctinfo, s32 off);
 };
 extern struct nfq_ct_hook __rcu *nfq_ct_hook;
-
-struct nfq_ct_nat_hook {
-	void (*seq_adjust)(struct sk_buff *skb, struct nf_conn *ct,
-			   u32 ctinfo, int off);
-};
-extern struct nfq_ct_nat_hook __rcu *nfq_ct_nat_hook;
 #else
 static inline void nf_ct_attach(struct sk_buff *new, struct sk_buff *skb) {}
 #endif

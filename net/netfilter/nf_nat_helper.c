@@ -20,20 +20,21 @@
 #include <net/netfilter/nf_conntrack_helper.h>
 #include <net/netfilter/nf_conntrack_ecache.h>
 #include <net/netfilter/nf_conntrack_expect.h>
+#include <net/netfilter/nf_conntrack_seqadj.h>
 #include <net/netfilter/nf_nat.h>
 #include <net/netfilter/nf_nat_l3proto.h>
 #include <net/netfilter/nf_nat_l4proto.h>
 #include <net/netfilter/nf_nat_core.h>
 #include <net/netfilter/nf_nat_helper.h>
 
-#define DUMP_OFFSET(x) \
+//#define DUMP_OFFSET(x) \
 	pr_debug("offset_before=%d, offset_after=%d, correction_pos=%u\n", \
 		 x->offset_before, x->offset_after, x->correction_pos);
 
 static DEFINE_SPINLOCK(nf_nat_seqofs_lock);
 
 /* Setup TCP sequence correction given this change at this sequence */
-static inline void
+/*static inline void
 adjust_tcp_sequence(u32 seq,
 		    int sizediff,
 		    struct nf_conn *ct,
@@ -49,13 +50,13 @@ adjust_tcp_sequence(u32 seq,
 	pr_debug("adjust_tcp_sequence: Seq_offset before: ");
 	DUMP_OFFSET(this_way);
 
-	spin_lock_bh(&nf_nat_seqofs_lock);
+	spin_lock_bh(&nf_nat_seqofs_lock);*/
 
 	/* SYN adjust. If it's uninitialized, or this is after last
 	 * correction, record it: we don't handle more than one
 	 * adjustment in the window, but do deal with common case of a
 	 * retransmit */
-	if (this_way->offset_before == this_way->offset_after ||
+	/*if (this_way->offset_before == this_way->offset_after ||
 	    before(this_way->correction_pos, seq)) {
 		this_way->correction_pos = seq;
 		this_way->offset_before = this_way->offset_after;
@@ -66,7 +67,7 @@ adjust_tcp_sequence(u32 seq,
 	pr_debug("adjust_tcp_sequence: Seq_offset after: ");
 	DUMP_OFFSET(this_way);
 }
-
+*/
 /* Get the offset value, for conntrack */
 s16 nf_nat_get_offset(const struct nf_conn *ct,
 		      enum ip_conntrack_dir dir,
@@ -141,7 +142,7 @@ static int enlarge_skb(struct sk_buff *skb, unsigned int extra)
 
 	return 1;
 }
-
+/*
 void nf_nat_set_seq_adjust(struct nf_conn *ct, enum ip_conntrack_info ctinfo,
 			   __be32 seq, s16 off)
 {
@@ -165,7 +166,7 @@ void nf_nat_tcp_seq_adjust(struct sk_buff *skb, struct nf_conn *ct,
 	nf_nat_set_seq_adjust(ct, ctinfo, th->seq, off);
 }
 EXPORT_SYMBOL_GPL(nf_nat_tcp_seq_adjust);
-
+*/
 /* Generic function for mangling variable-length address changes inside
  * NATed TCP connections (like the PORT XXX,XXX,XXX,XXX,XXX,XXX
  * command in FTP).
@@ -210,8 +211,8 @@ int __nf_nat_mangle_tcp_packet(struct sk_buff *skb,
 			     datalen, oldlen);
 
 	if (adjust && rep_len != match_len)
-		nf_nat_set_seq_adjust(ct, ctinfo, tcph->seq,
-				      (int)rep_len - (int)match_len);
+		nf_ct_seqadj_set(ct, ctinfo, tcph->seq,
+				 (int)rep_len - (int)match_len);
 
 	return 1;
 }
@@ -272,7 +273,7 @@ nf_nat_mangle_udp_packet(struct sk_buff *skb,
 EXPORT_SYMBOL(nf_nat_mangle_udp_packet);
 
 /* Adjust one found SACK option including checksum correction */
-static void
+/*static void
 sack_adjust(struct sk_buff *skb,
 	    struct tcphdr *tcph,
 	    unsigned int sackoff,
@@ -313,9 +314,9 @@ sack_adjust(struct sk_buff *skb,
 		sackoff += sizeof(*sack);
 	}
 }
-
+*/
 /* TCP SACK sequence number adjustment */
-static inline unsigned int
+/*static inline unsigned int
 nf_nat_sack_adjust(struct sk_buff *skb,
 		   unsigned int protoff,
 		   struct tcphdr *tcph,
@@ -333,9 +334,9 @@ nf_nat_sack_adjust(struct sk_buff *skb,
 
 	dir = CTINFO2DIR(ctinfo);
 
-	while (optoff < optend) {
+	while (optoff < optend) {*/
 		/* Usually: option, length. */
-		unsigned char *op = skb->data + optoff;
+		/*unsigned char *op = skb->data + optoff;
 
 		switch (op[0]) {
 		case TCPOPT_EOL:
@@ -343,9 +344,9 @@ nf_nat_sack_adjust(struct sk_buff *skb,
 		case TCPOPT_NOP:
 			optoff++;
 			continue;
-		default:
+		default:*/
 			/* no partial options */
-			if (optoff + 1 == optend ||
+			/*if (optoff + 1 == optend ||
 			    optoff + op[1] > optend ||
 			    op[1] < 2)
 				return 0;
@@ -359,9 +360,9 @@ nf_nat_sack_adjust(struct sk_buff *skb,
 	}
 	return 1;
 }
-
+*/
 /* TCP sequence number adjustment.  Returns 1 on success, 0 on failure */
-int
+/*int
 nf_nat_seq_adjust(struct sk_buff *skb,
 		  struct nf_conn *ct,
 		  enum ip_conntrack_info ctinfo,
@@ -409,7 +410,7 @@ nf_nat_seq_adjust(struct sk_buff *skb,
 
 	return nf_nat_sack_adjust(skb, protoff, tcph, ct, ctinfo);
 }
-
+*/
 /* Setup NAT on this expected conntrack so it follows master. */
 /* If we fail to get a free NAT slot, we'll get dropped on confirm */
 void nf_nat_follow_master(struct nf_conn *ct,

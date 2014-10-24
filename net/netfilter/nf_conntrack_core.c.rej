@@ -1,0 +1,11 @@
+--- net/netfilter/nf_conntrack_core.c
++++ net/netfilter/nf_conntrack_core.c
+@@ -1671,8 +1676,3 @@
+ err_stat:
+ 	return ret;
+ }
+-
+-s32 (*nf_ct_nat_offset)(const struct nf_conn *ct,
+-			enum ip_conntrack_dir dir,
+-			u32 seq);
+-EXPORT_SYMBOL_GPL(nf_ct_nat_offset);

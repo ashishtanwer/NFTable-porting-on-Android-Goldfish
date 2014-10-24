@@ -1,0 +1,1 @@
+cmd_net/netfilter/nf_conntrack_h323.o := /home/ashishtanwer/goldfish3.10/../x86_64-linux-android-4.7/bin/x86_64-linux-android-ld -m elf_i386   -r -o net/netfilter/nf_conntrack_h323.o net/netfilter/nf_conntrack_h323_main.o net/netfilter/nf_conntrack_h323_asn1.o 

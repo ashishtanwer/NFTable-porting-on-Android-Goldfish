@@ -1,0 +1,1 @@
+cmd_net/netfilter/ipset/ip_set.o := /home/ashishtanwer/goldfish3.10/../x86_64-linux-android-4.7/bin/x86_64-linux-android-ld -m elf_i386   -r -o net/netfilter/ipset/ip_set.o net/netfilter/ipset/ip_set_core.o net/netfilter/ipset/ip_set_getport.o net/netfilter/ipset/pfxlen.o 

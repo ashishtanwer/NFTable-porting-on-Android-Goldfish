@@ -1,0 +1,15 @@
+kernel/net/ipv6/netfilter/ip6table_security.ko
+kernel/net/ipv6/netfilter/ip6table_nat.ko
+kernel/net/ipv6/netfilter/nf_nat_ipv6.ko
+kernel/net/ipv6/netfilter/nf_tables_ipv6.ko
+kernel/net/ipv6/netfilter/nft_chain_route_ipv6.ko
+kernel/net/ipv6/netfilter/ip6t_ah.ko
+kernel/net/ipv6/netfilter/ip6t_eui64.ko
+kernel/net/ipv6/netfilter/ip6t_frag.ko
+kernel/net/ipv6/netfilter/ip6t_ipv6header.ko
+kernel/net/ipv6/netfilter/ip6t_mh.ko
+kernel/net/ipv6/netfilter/ip6t_hbh.ko
+kernel/net/ipv6/netfilter/ip6t_rpfilter.ko
+kernel/net/ipv6/netfilter/ip6t_rt.ko
+kernel/net/ipv6/netfilter/ip6t_MASQUERADE.ko
+kernel/net/ipv6/netfilter/ip6t_NPT.ko

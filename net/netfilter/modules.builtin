@@ -1,0 +1,12 @@
+kernel/net/netfilter/nfnetlink.ko
+kernel/net/netfilter/nfnetlink_log.ko
+kernel/net/netfilter/nf_conntrack.ko
+kernel/net/netfilter/nf_conntrack_netlink.ko
+kernel/net/netfilter/nf_conntrack_ftp.ko
+kernel/net/netfilter/nf_conntrack_irc.ko
+kernel/net/netfilter/nf_conntrack_broadcast.ko
+kernel/net/netfilter/nf_conntrack_netbios_ns.ko
+kernel/net/netfilter/x_tables.ko
+kernel/net/netfilter/xt_tcpudp.ko
+kernel/net/netfilter/xt_conntrack.ko
+kernel/net/netfilter/xt_state.ko
